@@ -1,22 +1,34 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Chatbot from "@/components/Chatbot";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "AI Automations Kurs",
-  description: "Grundgerüst für den Kurs",
+  title: "ChorAI - Managed Automation auf Ihrer Infrastruktur",
+  description: "Wir automatisieren Ihre Prozesse auf IHRER eigenen Infrastruktur. 100% Datenschutz. 0% Cloud-Zwang.",
+  keywords: "Automation, KI, Datenschutz, Docker, Managed Services, Bückeburg",
+  authors: [{ name: "Margarita Chorow" }],
+  metadataBase: new URL("https://chorai.de"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "ChorAI - Managed Automation",
+    description: "Wir automatisieren Ihre Prozesse auf IHRER eigenen Infrastruktur. 100% Datenschutz. 0% Cloud-Zwang.",
+    type: "website",
+    url: "https://chorai.de",
+    siteName: "ChorAI",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ChorAI - Managed Automation",
+    description: "Wir automatisieren Ihre Prozesse auf IHRER eigenen Infrastruktur. 100% Datenschutz. 0% Cloud-Zwang.",
+  },
 };
 
 export default function RootLayout({
@@ -25,13 +37,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de">
+    <html lang="de" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${jetbrainsMono.variable} antialiased bg-[#0a1525] text-slate-300`}
       >
-        <Header />
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-        <Chatbot />
+        {children}
       </body>
     </html>
   );
