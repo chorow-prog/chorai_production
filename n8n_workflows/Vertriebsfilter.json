@@ -1,0 +1,260 @@
+{
+  "name": "Vertriebsfilter",
+  "active": false,
+  "nodes": [
+    {
+      "id": "Webhook_Entry",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300],
+      "parameters": {
+        "path": "vertriebsfilter",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "responseData": "noData",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "Function_Enrich",
+      "name": "Lead Enrichment",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [440, 300],
+      "parameters": {
+        "functionCode": "const itemsOut = [];\\nfor (const item of items) {\\n  const { name = '', email = '', company = '', message = '', honeypot = '' } = item.json.body || item.json;\\n  const isSpam = Boolean(honeypot && honeypot.trim().length > 0) || !email.includes('@') || message.trim().length < 10;\\n  const score = Math.min(100, Math.max(0, message.trim().length));\\n  const category = score > 150 ? 'hot' : score > 80 ? 'warm' : 'cold';\\n  itemsOut.push({\\n    json: {\\n      name,\\n      email,\\n      company,\\n      message,\\n      meta: {\\n        isSpam,\\n        score,\\n        category,\\n        source: 'kontaktformular'\\n      }\\n    }\\n  });\\n}\\nreturn itemsOut;"
+      }
+    },
+    {
+      "id": "If_Spam",
+      "name": "Spam Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"meta\"][\"isSpam\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "Brevo_Contact",
+      "name": "Brevo ➜ Create/Update Contact",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 1,
+      "position": [920, 180],
+      "parameters": {
+        "resource": "contact",
+        "operation": "createOrUpdateContact",
+        "email": "={{$json[\"email\"]}}",
+        "attributes": {
+          "FIRSTNAME": "={{$json[\"name\"]}}",
+          "COMPANY": "={{$json[\"company\"]}}",
+          "LEAD_SCORE": "={{$json[\"meta\"][\"score\"]}}",
+          "LEAD_STATUS": "={{$json[\"meta\"][\"category\"]}}",
+          "SOURCE": "Website Kontaktformular",
+          "MESSAGE": "={{$json[\"message\"]}}"
+        },
+        "listIds": [
+          1
+        ],
+        "updateEnabled": true
+      },
+      "credentials": {
+        "brevoApi": "REPLACE_WITH_ID"
+      }
+    },
+    {
+      "id": "Brevo_InternalMail",
+      "name": "Brevo ➜ Notify Team",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 1,
+      "position": [1180, 120],
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "sender": {
+          "name": "Vertriebsfilter Bot",
+          "email": "info@chorai.de"
+        },
+        "toList": false,
+        "to": [
+          {
+            "email": "info@chorai.de",
+            "name": "ChorAI Team"
+          }
+        ],
+        "subject": "Neue Kontaktanfrage – ={{$json[\"name\"] || \"Unbekannt\"}}",
+        "htmlContent": "<h2>Neue Kontaktanfrage</h2><p><strong>Name:</strong> {{$json[\"name\"] || \"-\"}}</p><p><strong>E-Mail:</strong> {{$json[\"email\"] || \"-\"}}</p><p><strong>Unternehmen:</strong> {{$json[\"company\"] || \"-\"}}</p><p><strong>Lead-Score:</strong> {{$json[\"meta\"][\"score\"]}} ({{$json[\"meta\"][\"category\"]}})</p><p><strong>Nachricht:</strong><br>{{$json[\"message\"]}}</p>"
+      },
+      "credentials": {
+        "brevoApi": "REPLACE_WITH_ID"
+      }
+    },
+    {
+      "id": "Brevo_Confirmation",
+      "name": "Brevo ➜ Confirm Lead",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 1,
+      "position": [1440, 120],
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "sender": {
+          "name": "ChorAI Team",
+          "email": "info@chorai.de"
+        },
+        "toList": false,
+        "to": [
+          {
+            "email": "={{$json[\"email\"]}}",
+            "name": "={{$json[\"name\"] || \"\"}}"
+          }
+        ],
+        "subject": "Vielen Dank für Ihre Anfrage",
+        "htmlContent": "<h2>Vielen Dank für Ihre Anfrage!</h2><p>Hallo {{$json[\"name\"] || \"\"}},</p><p>wir haben Ihre Nachricht erhalten und melden uns schnellstmöglich.</p><p><strong>Ihre Angaben:</strong></p><ul><li>E-Mail: {{$json[\"email\"]}}</li><li>Unternehmen: {{$json[\"company\"] || \"-\"}}</li><li>Nachricht: {{$json[\"message\"]}}</li></ul><p>Freundliche Grüße<br>ChorAI Team</p>"
+      },
+      "credentials": {
+        "brevoApi": "REPLACE_WITH_ID"
+      }
+    },
+    {
+      "id": "Respond_Success",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1680, 120],
+      "parameters": {
+        "responseCode": 200,
+        "responseMode": "onReceived",
+        "responseData": "json",
+        "options": {
+          "responseContent": {
+            "fields": [
+              {
+                "name": "status",
+                "value": "success"
+              },
+              {
+                "name": "message",
+                "value": "Danke! Ihre Anfrage wurde übermittelt."
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "Respond_Spam",
+      "name": "Respond Spam",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [920, 460],
+      "parameters": {
+        "responseCode": 202,
+        "responseMode": "onReceived",
+        "responseData": "json",
+        "options": {
+          "responseContent": {
+            "fields": [
+              {
+                "name": "status",
+                "value": "queued"
+              },
+              {
+                "name": "message",
+                "value": "Danke! Wir prüfen Ihre Anfrage."
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Lead Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Spam Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spam Check": {
+      "main": [
+        [
+          {
+            "node": "Brevo ➜ Create/Update Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brevo ➜ Create/Update Contact": {
+      "main": [
+        [
+          {
+            "node": "Brevo ➜ Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brevo ➜ Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Brevo ➜ Confirm Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brevo ➜ Confirm Lead": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Europe/Berlin"
+  },
+  "versionId": "vertriebsfilter-template-1"
+}

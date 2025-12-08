@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 export default function Contact() {
@@ -11,13 +11,53 @@ export default function Contact() {
     company: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Hier würde normalerweise die Formular-Logik stehen
-    console.log("Form submitted:", formData);
-    alert("Vielen Dank für Ihre Anfrage! Wir melden uns schnellstmöglich bei Ihnen.");
-    setFormData({ name: "", email: "", company: "", message: "" });
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    // Debug: Log formData before sending
+    console.log("Form data being sent:", formData);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Fehler beim Senden der Nachricht");
+      }
+
+      // Erfolg: Formular zurücksetzen und Erfolgsmeldung anzeigen
+      setSubmitStatus({
+        type: "success",
+        message: data.message || "Vielen Dank für Ihre Anfrage! Wir melden uns schnellstmöglich bei Ihnen.",
+      });
+      setFormData({ name: "", email: "", company: "", message: "" });
+    } catch (error) {
+      // Fehler: Fehlermeldung anzeigen
+      setSubmitStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -83,9 +123,10 @@ export default function Contact() {
                 type="text"
                 id="name"
                 required
+                disabled={isSubmitting}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <div>
@@ -96,9 +137,10 @@ export default function Contact() {
                 type="email"
                 id="email"
                 required
+                disabled={isSubmitting}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <div>
@@ -108,9 +150,10 @@ export default function Contact() {
               <input
                 type="text"
                 id="company"
+                disabled={isSubmitting}
                 value={formData.company}
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <div>
@@ -121,18 +164,41 @@ export default function Contact() {
                 id="message"
                 required
                 rows={5}
+                disabled={isSubmitting}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none"
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
+
+            {/* Status-Meldung */}
+            {submitStatus.type && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-4 rounded-md flex items-start gap-3 ${
+                  submitStatus.type === "success"
+                    ? "bg-green-900/50 text-green-200 border border-green-700"
+                    : "bg-red-900/50 text-red-200 border border-red-700"
+                }`}
+              >
+                {submitStatus.type === "success" ? (
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                )}
+                <p className="flex-1">{submitStatus.message}</p>
+              </motion.div>
+            )}
+
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+              whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
               type="submit"
-              className="w-full bg-[#3b82f6] text-white py-3 rounded-md font-semibold hover:bg-[#2563eb] transition-colors"
+              disabled={isSubmitting}
+              className="w-full bg-[#3b82f6] text-white py-3 rounded-md font-semibold hover:bg-[#2563eb] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Analyse anfordern
+              {isSubmitting ? "Wird gesendet..." : "Analyse anfordern"}
             </motion.button>
           </motion.form>
         </div>
@@ -140,5 +206,3 @@ export default function Contact() {
     </section>
   );
 }
-
-
