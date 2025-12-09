@@ -64,10 +64,13 @@ export async function POST(request: Request) {
       };
   
       // Request an n8n Webhook senden
+      const adminToken = process.env.ADMIN_TOKEN;
+
       const res = await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(adminToken ? { "X-Admin-Token": adminToken } : {}),
         },
         body: JSON.stringify(payload),
       });

@@ -15,6 +15,7 @@ services:
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       ADMIN_TOKEN: ${ADMIN_TOKEN}
       AUTH_DISABLED: ${AUTH_DISABLED}
+      N8N_CONTACT_WEBHOOK_URL: https://n8n.chorai.de/webhook/vertriebsfilter
     ports:
       - "127.0.0.1:3000:3000"
     healthcheck:

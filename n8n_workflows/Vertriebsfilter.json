@@ -1,6 +1,6 @@
 {
   "name": "Vertriebsfilter",
-  "active": false,
+  "active": true,
   "settings": { "timezone": "Europe/Berlin" },
   "nodes": [
     {
@@ -40,7 +40,7 @@
     {
       "id": "Brevo_Contact",
       "name": "Brevo ➜ Create/Update Contact",
-      "type": "n8n-nodes-base.brevo",
+      "type": "n8n-nodes-base.sendInBlue",
       "typeVersion": 1,
       "position": [920, 180],
       "parameters": {
@@ -58,12 +58,12 @@
         "listIds": [1],
         "updateEnabled": true
       },
-      "credentials": { "brevoApi": "REPLACE_WITH_ID" }
+      "credentials": { "sendInBlueApi": { "id": "mmjAhLwD37BmiY3X", "name": "Brevo account" } }
     },
     {
       "id": "Brevo_Notify",
       "name": "Brevo ➜ Send to Team",
-      "type": "n8n-nodes-base.brevo",
+      "type": "n8n-nodes-base.sendInBlue",
       "typeVersion": 1,
       "position": [1180, 120],
       "parameters": {
@@ -72,15 +72,15 @@
         "sender": { "name": "Vertriebsfilter Bot", "email": "info@chorai.de" },
         "toList": false,
         "to": [ { "email": "info@chorai.de", "name": "ChorAI Team" } ],
-        "subject": "Neue Kontaktanfrage – ={{$json[\"name\"] || \"Unbekannt\"}}",
+        "subject": "Neue Kontaktanfrage – {{$json[\"name\"] || \"Unbekannt\"}}",
         "htmlContent": "<h2>Neue Kontaktanfrage</h2><p><strong>Name:</strong> {{$json[\"name\"] || \"-\"}}</p><p><strong>E-Mail:</strong> {{$json[\"email\"] || \"-\"}}</p><p><strong>Unternehmen:</strong> {{$json[\"company\"] || \"-\"}}</p><p><strong>Lead-Score:</strong> {{$json[\"meta\"][\"score\"]}} ({{$json[\"meta\"][\"category\"]}})</p><p><strong>Nachricht:</strong><br>{{$json[\"message\"]}}</p>"
       },
-      "credentials": { "brevoApi": "REPLACE_WITH_ID" }
+      "credentials": { "sendInBlueApi": { "id": "mmjAhLwD37BmiY3X", "name": "Brevo account" } }
     },
     {
       "id": "Brevo_Confirm",
       "name": "Brevo ➜ Send to Lead",
-      "type": "n8n-nodes-base.brevo",
+      "type": "n8n-nodes-base.sendInBlue",
       "typeVersion": 1,
       "position": [1440, 120],
       "parameters": {
@@ -92,7 +92,7 @@
         "subject": "Vielen Dank für Ihre Anfrage",
         "htmlContent": "<h2>Vielen Dank für Ihre Anfrage!</h2><p>Hallo {{$json[\"name\"] || \"\"}},</p><p>wir haben Ihre Nachricht erhalten und melden uns schnellstmöglich.</p><p><strong>Ihre Angaben:</strong></p><ul><li>E-Mail: {{$json[\"email\"]}}</li><li>Unternehmen: {{$json[\"company\"] || \"-\"}}</li><li>Nachricht: {{$json[\"message\"]}}</li></ul><p>Freundliche Grüße<br>ChorAI Team</p>"
       },
-      "credentials": { "brevoApi": "REPLACE_WITH_ID" }
+      "credentials": { "sendInBlueApi": { "id": "mmjAhLwD37BmiY3X", "name": "Brevo account" } }
     },
     {
       "id": "Respond_OK",

@@ -12,6 +12,7 @@ export default function Contact() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error" | null;
     message: string;
@@ -21,6 +22,15 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus({ type: null, message: "" });
+
+    if (!consent) {
+      setSubmitStatus({
+        type: "error",
+        message: "Bitte akzeptieren Sie die Datenschutzbestimmungen.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     // Debug: Log formData before sending
     console.log("Form data being sent:", formData);
@@ -46,6 +56,7 @@ export default function Contact() {
         message: data.message || "Vielen Dank für Ihre Anfrage! Wir melden uns schnellstmöglich bei Ihnen.",
       });
       setFormData({ name: "", email: "", company: "", message: "" });
+      setConsent(false);
     } catch (error) {
       // Fehler: Fehlermeldung anzeigen
       setSubmitStatus({
@@ -171,6 +182,26 @@ export default function Contact() {
               />
             </div>
 
+            {/* DSGVO-Checkbox */}
+            <div className="flex items-start gap-3">
+              <input
+                id="consent"
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                disabled={isSubmitting}
+                className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-800 text-[#3b82f6] focus:ring-[#3b82f6] disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <label htmlFor="consent" className="text-sm text-slate-400 leading-5">
+                Ich stimme zu, dass meine Angaben zur Kontaktaufnahme und für Rückfragen dauerhaft
+                gespeichert werden. Ich habe die{" "}
+                <a href="/datenschutz" className="text-[#3b82f6] hover:underline">
+                  Datenschutzerklärung
+                </a>{" "}
+                zur Kenntnis genommen.
+              </label>
+            </div>
+
             {/* Status-Meldung */}
             {submitStatus.type && (
               <motion.div
@@ -195,7 +226,7 @@ export default function Contact() {
               whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
               whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !consent}
               className="w-full bg-[#3b82f6] text-white py-3 rounded-md font-semibold hover:bg-[#2563eb] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Wird gesendet..." : "Analyse anfordern"}

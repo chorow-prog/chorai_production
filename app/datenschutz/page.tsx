@@ -169,6 +169,24 @@ export default function Datenschutz() {
             <p>
               Die von Ihnen im Kontaktformular eingegebenen Daten verbleiben bei uns, bis Sie uns zur Löschung auffordern, Ihre Einwilligung zur Speicherung widerrufen oder der Zweck für die Datenspeicherung entfällt (z. B. nach abgeschlossener Bearbeitung Ihrer Anfrage). Zwingende gesetzliche Bestimmungen – insbesondere Aufbewahrungsfristen – bleiben unberührt.
             </p>
+
+            <h3 className="text-xl font-semibold mb-3 text-slate-100 mt-6">Versanddienstleister Brevo</h3>
+            <p>
+              Diese Website nutzt Brevo für den Versand von Newslettern und die Bearbeitung von Kontaktanfragen. Anbieter ist die Sendinblue GmbH, Köpenicker Straße 126, 10179 Berlin, Deutschland.
+            </p>
+            <p>
+              Brevo ist ein Dienst, mit dem u.a. der Newsletterversand und Kontaktanfragen organisiert und analysiert werden können. Die von Ihnen eingegebenen Daten (z.&nbsp;B. E-Mail-Adresse) werden auf den Servern von Brevo in Deutschland gespeichert.
+            </p>
+
+            <h4 className="text-lg font-semibold mb-2 text-slate-100 mt-4">Rechtsgrundlage</h4>
+            <p>
+              Die Datenverarbeitung erfolgt auf Grundlage Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können diese Einwilligung jederzeit widerrufen. Die Rechtmäßigkeit der bereits erfolgten Datenverarbeitungsvorgänge bleibt vom Widerruf unberührt.
+            </p>
+
+            <h4 className="text-lg font-semibold mb-2 text-slate-100 mt-4">Auftragsverarbeitung</h4>
+            <p>
+              Wir haben mit Brevo einen Vertrag zur Auftragsverarbeitung (AVV) abgeschlossen. Hierbei handelt es sich um einen datenschutzrechtlich vorgeschriebenen Vertrag, der gewährleistet, dass Brevo die personenbezogenen Daten unserer Websitebesucher nur nach unseren Weisungen und unter Einhaltung der DSGVO verarbeitet.
+            </p>
           </section>
         </div>
 
