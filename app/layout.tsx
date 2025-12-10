@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -7,6 +7,12 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "700"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "ChorAI - Managed Automation auf Ihrer Infrastruktur",
@@ -37,9 +43,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className="dark">
+    <html lang="de" className="dark overflow-x-hidden">
       <body
-        className={`${jetbrainsMono.variable} antialiased bg-[#0a1525] text-slate-300`}
+        className={`${jetbrainsMono.variable} antialiased bg-[#0a1525] text-slate-300 overflow-x-hidden w-full max-w-full`}
       >
         {children}
       </body>

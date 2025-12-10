@@ -12,7 +12,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden overflow-x-hidden pt-16 w-full max-w-full min-w-0">
       {/* Background Grid */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -28,29 +28,29 @@ export default function Hero() {
       <div className="absolute top-20 right-20 w-96 h-96 bg-[#3b82f6]/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#3b82f6]/5 rounded-full blur-3xl" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10 w-full flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center"
+          className="text-center w-full max-w-[80vw] sm:max-w-full mx-auto"
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-slate-100 leading-tight">
+          <h1 className="text-[clamp(1.2rem,6.5vw,2.1rem)] sm:text-4xl md:text-7xl font-bold mb-6 text-slate-100 leading-tight break-words hyphens-auto tracking-tight">
             SIND SIE NOCH GESCHÄFTSFÜHRER
             <br />
             ODER SCHON SEKRETÄR?
           </h1>
-          <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-[clamp(0.9rem,4vw,1.15rem)] sm:text-lg md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed break-words hyphens-auto">
             Wir automatisieren Ihre Prozesse auf <span className="text-[#3b82f6] font-semibold">IHRER</span> eigenen Infrastruktur.
             <br />
             <span className="text-[#3b82f6]">100% Datenschutz.</span> <span className="text-slate-500">0% Cloud-Zwang.</span>
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto items-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={scrollToContact}
-              className="bg-[#3b82f6] text-white px-8 py-4 rounded-md text-lg font-semibold hover:bg-[#2563eb] transition-colors shadow-lg shadow-[#3b82f6]/20"
+              className="bg-[#3b82f6] text-white px-4 py-3 sm:px-8 sm:py-4 rounded-md text-[clamp(0.85rem,3.5vw,0.95rem)] sm:text-lg font-semibold hover:bg-[#2563eb] transition-colors shadow-lg shadow-[#3b82f6]/20 w-full sm:w-auto max-w-[70vw]"
             >
               Kostenlose Analyse anfordern
             </motion.button>
@@ -58,7 +58,7 @@ export default function Hero() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => document.getElementById("preise")?.scrollIntoView({ behavior: "smooth" })}
-              className="border-2 border-[#3b82f6] text-[#3b82f6] px-8 py-4 rounded-md text-lg font-semibold hover:bg-[#3b82f6]/10 transition-colors"
+              className="border-2 border-[#3b82f6] text-[#3b82f6] px-4 py-3 sm:px-8 sm:py-4 rounded-md text-[clamp(0.85rem,3.5vw,0.95rem)] sm:text-lg font-semibold hover:bg-[#3b82f6]/10 transition-colors w-full sm:w-auto max-w-[70vw]"
             >
               Preise ansehen
             </motion.button>
