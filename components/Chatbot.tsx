@@ -82,7 +82,7 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const promptTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const promptIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const promptAutoHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -95,38 +95,43 @@ export default function Chatbot() {
   useEffect(() => {
     if (isOpen) {
       setShowPrompt(false);
-      if (promptIntervalRef.current) {
-        clearInterval(promptIntervalRef.current);
-        promptIntervalRef.current = null;
-      }
       if (promptTimeoutRef.current) {
         clearTimeout(promptTimeoutRef.current);
         promptTimeoutRef.current = null;
+      }
+      if (promptAutoHideTimeoutRef.current) {
+        clearTimeout(promptAutoHideTimeoutRef.current);
+        promptAutoHideTimeoutRef.current = null;
       }
       return;
     }
 
-    const triggerPrompt = () => {
-      setShowPrompt(true);
-      if (promptTimeoutRef.current) {
-        clearTimeout(promptTimeoutRef.current);
-      }
-      promptTimeoutRef.current = setTimeout(() => {
-        setShowPrompt(false);
-      }, 4000);
-    };
+    if (typeof window === "undefined") {
+      return;
+    }
 
-    triggerPrompt();
-    promptIntervalRef.current = setInterval(triggerPrompt, 20000);
+    const hasSeenPrompt = window.sessionStorage.getItem("chat_prompt_seen");
+    if (hasSeenPrompt === "true") {
+      return;
+    }
+
+    promptTimeoutRef.current = setTimeout(() => {
+      setShowPrompt(true);
+      window.sessionStorage.setItem("chat_prompt_seen", "true");
+
+      promptAutoHideTimeoutRef.current = setTimeout(() => {
+        setShowPrompt(false);
+      }, 10000);
+    }, 30000);
 
     return () => {
-      if (promptIntervalRef.current) {
-        clearInterval(promptIntervalRef.current);
-        promptIntervalRef.current = null;
-      }
       if (promptTimeoutRef.current) {
         clearTimeout(promptTimeoutRef.current);
         promptTimeoutRef.current = null;
+      }
+      if (promptAutoHideTimeoutRef.current) {
+        clearTimeout(promptAutoHideTimeoutRef.current);
+        promptAutoHideTimeoutRef.current = null;
       }
     };
   }, [isOpen]);
@@ -323,7 +328,7 @@ export default function Chatbot() {
       {!isOpen && showPrompt && (
         <div className="fixed bottom-24 right-6 z-50 animate-bounce">
           <div className="relative rounded-2xl bg-white px-4 py-3 text-sm font-medium text-zinc-900 shadow-xl dark:bg-zinc-900 dark:text-white">
-            {CHATBOT_NAME}: Haben Sie Fragen?
+            Haben Sie noch Fragen?
             <span className="absolute -bottom-2 right-6 h-4 w-4 rotate-45 rounded-sm bg-white dark:bg-zinc-900"></span>
           </div>
         </div>
@@ -355,7 +360,9 @@ export default function Chatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[600px] w-[400px] flex-col rounded-lg border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+        <div
+          className="fixed bottom-4 right-4 z-50 flex h-[calc(100vh-2.5rem)] w-[calc(100vw-2rem)] max-h-[calc(100vh-2.5rem)] max-w-md flex-col rounded-lg border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900 md:bottom-6 md:right-6 md:h-[600px] md:w-[400px] md:max-h-none"
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
             <div className="flex items-center gap-2">
