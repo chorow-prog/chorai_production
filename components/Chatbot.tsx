@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
+import { extractReplyText } from "@/lib/chatbot-response";
 
 interface Message {
   id: string;
@@ -61,6 +62,10 @@ const createMarkdownComponents = (variant: "user" | "bot"): Components => ({
 });
 
 export default function Chatbot() {
+  const CHATBOT_NAME = "Chorwi der FAQ Chatbot";
+  const webhookUrl =
+    process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ??
+    "https://n8n.chorai.de/webhook/chatbot";
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -73,8 +78,11 @@ export default function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const promptTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const promptIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,6 +91,45 @@ export default function Chatbot() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowPrompt(false);
+      if (promptIntervalRef.current) {
+        clearInterval(promptIntervalRef.current);
+        promptIntervalRef.current = null;
+      }
+      if (promptTimeoutRef.current) {
+        clearTimeout(promptTimeoutRef.current);
+        promptTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    const triggerPrompt = () => {
+      setShowPrompt(true);
+      if (promptTimeoutRef.current) {
+        clearTimeout(promptTimeoutRef.current);
+      }
+      promptTimeoutRef.current = setTimeout(() => {
+        setShowPrompt(false);
+      }, 4000);
+    };
+
+    triggerPrompt();
+    promptIntervalRef.current = setInterval(triggerPrompt, 20000);
+
+    return () => {
+      if (promptIntervalRef.current) {
+        clearInterval(promptIntervalRef.current);
+        promptIntervalRef.current = null;
+      }
+      if (promptTimeoutRef.current) {
+        clearTimeout(promptTimeoutRef.current);
+        promptTimeoutRef.current = null;
+      }
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -135,7 +182,7 @@ export default function Chatbot() {
           typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       };
 
-      const response = await fetch("/api/chat", {
+      const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,14 +194,110 @@ export default function Chatbot() {
         }),
       });
 
+      // #region agent log
+      const outboundLog = {
+        sessionId: "debug-session",
+        runId: "run2",
+        hypothesisId: "H5",
+        location: "components/Chatbot.tsx:sendMessage",
+        message: "Sending request to webhook",
+        data: {
+          hasSessionId: !!sessionId,
+          messageLength: userMessage.text.length,
+          webhookUrl,
+        },
+        timestamp: Date.now(),
+      };
+      fetch("http://localhost:7242/ingest/cde80c10-4bbf-49dd-9871-235c903f9938", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(outboundLog),
+      }).catch(() => {});
+      fetch("/api/_debug-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(outboundLog),
+      }).catch(() => {});
+      // #endregion
+
+      if (!response.ok) {
+        throw new Error(`Webhook responded with ${response.status}`);
+      }
+
+      // #region agent log
+      const statusLog = {
+        sessionId: "debug-session",
+        runId: "run2",
+        hypothesisId: "H6",
+        location: "components/Chatbot.tsx:sendMessage",
+        message: "Webhook response status",
+        data: { status: response.status },
+        timestamp: Date.now(),
+      };
+      fetch("http://localhost:7242/ingest/cde80c10-4bbf-49dd-9871-235c903f9938", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(statusLog),
+      }).catch(() => {});
+      fetch("/api/_debug-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(statusLog),
+      }).catch(() => {});
+      // #endregion
+
       const data = await response.json();
+      const botText =
+        extractReplyText(data) ||
+        "Entschuldigung, ich konnte keine Antwort generieren.";
+
+      // #region agent log
+      fetch("http://localhost:7242/ingest/cde80c10-4bbf-49dd-9871-235c903f9938", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "debug-session",
+          runId: "run2",
+          hypothesisId: "H4",
+          location: "components/Chatbot.tsx:sendMessage",
+          message: "Browser received bot reply",
+          data: {
+            botTextLength: botText.length,
+            hasReply: botText !== "Entschuldigung, ich konnte keine Antwort generieren.",
+            topLevelKeys:
+              data && typeof data === "object"
+                ? Object.keys(data as Record<string, unknown>).slice(0, 6)
+                : [],
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      fetch("/api/_debug-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "debug-session",
+          runId: "run2",
+          hypothesisId: "H4",
+          location: "components/Chatbot.tsx:sendMessage",
+          message: "Browser received bot reply",
+          data: {
+            botTextLength: botText.length,
+            hasReply:
+              botText !== "Entschuldigung, ich konnte keine Antwort generieren.",
+            topLevelKeys:
+              data && typeof data === "object"
+                ? Object.keys(data as Record<string, unknown>).slice(0, 6)
+                : [],
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text:
-          data.reply ||
-          data.message ||
-          "Entschuldigung, ich konnte keine Antwort generieren.",
+        text: botText,
         sender: "bot",
         timestamp: new Date(),
       };
@@ -176,12 +319,22 @@ export default function Chatbot() {
 
   return (
     <>
+      {/* Chat Prompt Bubble */}
+      {!isOpen && showPrompt && (
+        <div className="fixed bottom-24 right-6 z-50 animate-bounce">
+          <div className="relative rounded-2xl bg-white px-4 py-3 text-sm font-medium text-zinc-900 shadow-xl dark:bg-zinc-900 dark:text-white">
+            {CHATBOT_NAME}: Haben Sie Fragen?
+            <span className="absolute -bottom-2 right-6 h-4 w-4 rotate-45 rounded-sm bg-white dark:bg-zinc-900"></span>
+          </div>
+        </div>
+      )}
+
       {/* Chat Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 hover:scale-110"
-          aria-label="Chat öffnen"
+          aria-label={`${CHATBOT_NAME} öffnen`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -207,7 +360,7 @@ export default function Chatbot() {
           <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-green-500"></div>
-              <h3 className="font-semibold">Chatbot</h3>
+              <h3 className="font-semibold">{CHATBOT_NAME}</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}

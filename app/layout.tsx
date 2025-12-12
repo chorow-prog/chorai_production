@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import Chatbot from "@/components/Chatbot";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -48,6 +49,7 @@ export default function RootLayout({
         className={`${jetbrainsMono.variable} antialiased bg-[#0a1525] text-slate-300 overflow-x-hidden w-full max-w-full`}
       >
         {children}
+        <Chatbot />
       </body>
     </html>
   );
