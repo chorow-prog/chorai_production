@@ -15,8 +15,12 @@ const jetbrainsMono = JetBrains_Mono({
 const localBusinessJsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
+  "@id": "https://chorai.de/#business",
   name: "ChorAI",
-  description: "IT-Dienstleistungen und Prozessautomatisierung",
+  description: "IT-Dienstleistungen und Prozessautomatisierung für Handwerk und KMU",
+  email: "info@chorai.de",
+  founder: { "@type": "Person", name: "Margarita Chorow" },
+  image: "https://chorai.de/opengraph-image",
   priceRange: "$$",
   areaServed: [
     { "@type": "AdministrativeArea", name: "Schaumburg" },
@@ -38,7 +42,6 @@ const localBusinessJsonLd = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export const metadata: Metadata = {
@@ -49,22 +52,13 @@ export const metadata: Metadata = {
     "Prozessautomatisierung für KMU, Prozessautomatisierung Handwerk, IT-Service Kreis Schaumburg & Minden-Lübbecke, Büro Digitalisierung OWL, datenschutzorientierte KI, DSGVO, Automatisierung, Bückeburg, Minden, Schaumburg, Ostwestfalen-Lippe",
   authors: [{ name: "Margarita Chorow" }],
   metadataBase: new URL("https://chorai.de"),
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
-    title: "Prozessautomatisierung Handwerk & KMU | ChorAI",
-    description:
-      "Wir automatisieren lästige Büroarbeit für Handwerker und KMUs im Landkreis Schaumburg, Minden-Lübbecke und Umgebung. Eigene Server, datenschutzorientiert, staatlich gefördert.",
     type: "website",
-    url: "https://chorai.de",
     siteName: "ChorAI",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Prozessautomatisierung Handwerk & KMU | ChorAI",
-    description:
-      "Wir automatisieren lästige Büroarbeit für Handwerker und KMUs im Landkreis Schaumburg, Minden-Lübbecke und Umgebung. Eigene Server, datenschutzorientiert, staatlich gefördert.",
   },
 };
 

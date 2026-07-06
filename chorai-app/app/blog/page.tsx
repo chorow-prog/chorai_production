@@ -1,6 +1,15 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+export const metadata = {
+  title: "Blog | ChorAI",
+  description:
+    "Neuigkeiten und Praxiswissen zu Prozessautomatisierung und KI für Handwerk und KMU.",
+  alternates: {
+    canonical: "/blog",
+  },
+};
+
 export default function BlogPage() {
   return (
     <>

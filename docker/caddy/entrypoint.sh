@@ -30,12 +30,13 @@ cat <<EOF >/etc/caddy/Caddyfile
 
 https://${ROOT_DOMAIN} {
     encode gzip
+    header Strict-Transport-Security "max-age=31536000"
     reverse_proxy web:3000
 }
 
 https://www.${ROOT_DOMAIN} {
-    encode gzip
-    reverse_proxy web:3000
+    header Strict-Transport-Security "max-age=31536000"
+    redir https://${ROOT_DOMAIN}{uri} permanent
 }
 EOF
 

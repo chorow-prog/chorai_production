@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 export const metadata = {
   title: "Allgemeine Geschäftsbedingungen - ChorAI",
   description: "AGB der ChorAI",
+  robots: { index: false, follow: true },
 };
 
 export default function AGB() {

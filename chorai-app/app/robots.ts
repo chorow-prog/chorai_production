@@ -6,7 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/agb', '/datenschutz', '/impressum'],
       },
     ],
     sitemap: 'https://chorai.de/sitemap.xml',

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata = {
   title: "Datenschutzerklärung - ChorAI",
   description: "Datenschutzerklärung der ChorAI",
+  robots: { index: false, follow: true },
 };
 
 export default function Datenschutz() {

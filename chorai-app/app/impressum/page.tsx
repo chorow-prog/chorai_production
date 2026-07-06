@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata = {
   title: "Impressum - ChorAI",
   description: "Impressum der ChorAI",
+  robots: { index: false, follow: true },
 };
 
 export default function Impressum() {
