@@ -2,10 +2,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SolutionLandingPage from "@/components/SolutionLandingPage";
 import ContactFormCompactSection from "@/components/ContactFormCompactSection";
+import FAQSection from "@/components/FAQSection";
 
 export const metadata = {
   title: "KI-Telefonassistent | ChorAI",
   description: "KI-Telefonassistent – Anrufe annehmen, Anliegen sortieren, Termine vorbereiten.",
+  alternates: {
+    canonical: "/loesungen/ki-telefonassistent",
+  },
 };
 
 export default function KiTelefonassistentPage() {
@@ -49,6 +53,41 @@ export default function KiTelefonassistentPage() {
         imageSrc="/loesungen/ki-telefonassistent.svg"
         ctaLabel="Telefonassistent planen"
         ctaHref="#kontakt"
+      />
+      <FAQSection
+        title="Häufig gefragt"
+        items={[
+          {
+            question: "Kostet der KI-Telefonassistent monatlich, oder einmalig?",
+            answer:
+              "Es gibt beide Modelle: Manche Kunden zahlen monatlich für die Telefon-Nummer und die KI-Verarbeitung, andere zahlen eine einmalige Einrichtung plus Kosten pro Minute. Das hängt von Ihrem Anrufvolumen ab.",
+          },
+          {
+            question: "Können Kunden den Assistenten vom Menschen unterscheiden?",
+            answer:
+              "Das hängt vom Setup ab. Mit modernen TTS-Systemen klingt es heute sehr natürlich – viele Kunden bemerken nicht sofort, dass sie mit einer KI sprechen. Transparent zu sein ist eine gute Idee.",
+          },
+          {
+            question: "Was passiert bei Notfällen? Kann der Assistent sofort eskalieren?",
+            answer:
+              "Ja. Sie definieren Notfall-Begriffe (z.B. Wasser im Keller, Brand) und der Assistent übergibt sofort an einen Menschen oder die Feuerwehr – je nach Ihren Regeln.",
+          },
+          {
+            question: "Welche Telefon-Nummer nutzen wir?",
+            answer:
+              "Ihr besteht mehrere Optionen: eine neue Nummer nur für den Assistenten, Ihre bestehende Nummer (mit Zusatz-Route) oder beides. Wir besprechen das bei der Planung.",
+          },
+          {
+            question: "Wie gut ist die Spracherkennung bei Akzenten oder schlechtem Sound?",
+            answer:
+              "Modern KI-Spracherkennung ist robust für die meisten Akzente und mittelmäßigen Verbindungen. Bei sehr schlechtem Sound oder sehr seltenem Dialekt kann es zu Missverständnissen kommen – dafür hat der Assistent Rückfragen-Mechanismen.",
+          },
+          {
+            question: "Brauchen wir eine bestimmte Telefonanlage?",
+            answer:
+              "Nein. Der Assistent kann an jede moderne Anlage oder Telefonanbieter angebunden werden. Wir klären die technischen Details vor der Umsetzung.",
+          },
+        ]}
       />
       <ContactFormCompactSection />
       <Footer />

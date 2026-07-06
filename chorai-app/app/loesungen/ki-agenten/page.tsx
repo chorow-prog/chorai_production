@@ -2,10 +2,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SolutionLandingPage from "@/components/SolutionLandingPage";
 import ContactFormCompactSection from "@/components/ContactFormCompactSection";
+import FAQSection from "@/components/FAQSection";
 
 export const metadata = {
   title: "KI-Agenten | ChorAI",
   description: "KI-Agenten für Handwerk & KMU – wiederkehrende Aufgaben automatisch erledigen lassen.",
+  alternates: {
+    canonical: "/loesungen/ki-agenten",
+  },
 };
 
 export default function KiAgentenPage() {
@@ -52,6 +56,36 @@ export default function KiAgentenPage() {
         imageSrc="/loesungen/ki-agenten.svg"
         ctaLabel="Use-Case besprechen"
         ctaHref="#kontakt"
+      />
+      <FAQSection
+        title="Häufig gefragt"
+        items={[
+          {
+            question: "Wie unterscheidet sich ein KI-Agent vom Chatbot?",
+            answer:
+              "Ein Chatbot beantwortet Fragen, die der Besucher stellt. Ein Agent ist proaktiv: Er liest Anfragen, erkennt Muster, stellt fehlende Infos nach — und startet Prozesse im Hintergrund (Ticketing, Terminbuchung usw.). Ein Agent ist eine Stufe selbstständiger.",
+          },
+          {
+            question: "Was kann der Agent lernen, und was nicht?",
+            answer:
+              "Der Agent kann Ihre Regeln und Daten nutzen, um besser zu werden. Er kann aber nicht selbstständig neue Aufgaben erfinden – das definiert ihr zusammen. Und er wird nicht künstlicher, je länger er läuft (das ist ein Mythos).",
+          },
+          {
+            question: "Brauchen wir zuerst eine Beratung, oder können wir direkt mit dem Agent starten?",
+            answer:
+              "Das hängt ab: Wenn Ihre Prozesse (Anfrage → Angebot → Auftrag) klar sind, können wir direkt starten. Wenn noch unklar ist, wo Automatisierung am meisten bringt, lohnt sich zuerst eine Beratung.",
+          },
+          {
+            question: "Was passiert mit Anfragen, die der Agent nicht verarbeiten kann?",
+            answer:
+              "Davon gibt es immer einige. Der Agent eskaliert diese an einen Kollegen oder Sie – mit allen Infos, die er bis dahin gesammelt hat. Das ist ein normaler Teil des Designs.",
+          },
+          {
+            question: "Wie schnell läuft ein Agent? Gibt es Latenz?",
+            answer:
+              "Moderner KI-Agenten verarbeiten Anfragen meist in Sekunden bis Minuten. Es gibt minimale Latenz durch API-Aufrufe, aber für Kundensupport ist das akzeptabel. Rückfragen gehen über E-Mail oder Chat, nicht in Echtzeit.",
+          },
+        ]}
       />
       <ContactFormCompactSection />
       <Footer />

@@ -2,10 +2,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SolutionLandingPage from "@/components/SolutionLandingPage";
 import ContactFormCompactSection from "@/components/ContactFormCompactSection";
+import FAQSection from "@/components/FAQSection";
 
 export const metadata = {
   title: "Prozessautomatisierung | ChorAI",
   description: "Prozessautomatisierung für Handwerk & KMU – weniger Büro, mehr Zeit fürs Kerngeschäft.",
+  alternates: {
+    canonical: "/loesungen/prozessautomatisierung",
+  },
 };
 
 export default function ProzessautomatisierungPage() {
@@ -52,6 +56,41 @@ export default function ProzessautomatisierungPage() {
         imageSrc="/loesungen/prozessautomatisierung.svg"
         ctaLabel="Workflow-Idee prüfen"
         ctaHref="#kontakt"
+      />
+      <FAQSection
+        title="Häufig gefragt"
+        items={[
+          {
+            question: "Mit welchen Systemen könnt ihr integrieren?",
+            answer:
+              "Wir verbinden die meisten verbreiteten Systeme: E-Mail, Kalender, CRM (Salesforce, HubSpot, Pipedrive), ERP, Buchhaltungssoftware, Handwerker-Apps. Wenn Ihr System eine API oder SMTP/REST-Schnittstelle hat, können wir eine Brücke bauen.",
+          },
+          {
+            question: "Wie lange braucht eine typische Automatisierung?",
+            answer:
+              "Ein einfacher Workflow (z.B. Anfrage → Angebot → Rechnung) dauert 3–6 Wochen. Komplexere Abläufe mit mehreren Bedingungen oder Systemen können länger dauern. Wir starten mit einem Piloten, der schnell Wirkung zeigt.",
+          },
+          {
+            question: "Was passiert, wenn der Automatisierungsdienst ausfällt?",
+            answer:
+              "Alle Automatisierungen haben Fehlerbehandlung und Fallbacks eingebaut. Wenn ein System nicht erreichbar ist, werden Anfragen gepuffert und später wiederholt oder Sie bekommen eine Warnung, damit Sie manuell eingreifen können.",
+          },
+          {
+            question: "Können wir die Automatisierung später ändern oder ausbauen?",
+            answer:
+              "Ja, absolut. Das ist ein Vorteil von gut dokumentierter Automatisierung: Sie können anfangen mit den zwei dringendsten Workflows, später weitere dazunehmen oder ändern. Wir dokumentieren alles so, dass auch andere Entwickler einsteigen können.",
+          },
+          {
+            question: "Brauchen wir eine Person, die die Automatisierung administriert?",
+            answer:
+              "Nein, aber eine Person sollte die Logs im Auge behalten und bei größeren Änderungen involviert sein. Für die meisten Kunden reicht ein monatlicher Check-in, ob alles läuft.",
+          },
+          {
+            question: "Wie sieht es mit Sicherheit und Datenschutz aus?",
+            answer:
+              "Daten werden verschlüsselt übertragen, Logs sind geschützt, und Zugriff ist protokolliert. Wir halten DSGVO-Anforderungen ein: Ihre Daten landen nicht bei uns oder dritten, sondern nur in Ihren Systemen. Das dokumentieren wir in einer DPA.",
+          },
+        ]}
       />
       <ContactFormCompactSection />
       <Footer />
