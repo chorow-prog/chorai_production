@@ -43,6 +43,29 @@ Weitere Compose-Services: `n8n` (Automatisierung/Mail), `caddy` (Reverse-Proxy +
 - Scroll-Verhalten zentral in `src/app/services/scroll.service.ts` (`scrollTo(section)` / `scrollToTop()`); navigiert von Unterseiten erst zur Startseite.
 - AOS (Animate-On-Scroll) ist eingebunden: `AOS.init()` in `app.ts` (`ngAfterViewInit`), CSS-Import in `src/styles.scss`, Animationen über `data-aos="…"`-Attribute direkt am Element.
 
+## chorai-app: SEO & Metadaten (Next.js App Router)
+
+**Die zwei Vererbungsfallen im App Router** (Ursache der SEO-Bugs vom 2026-07-06 — beim Anlegen neuer Seiten beachten):
+
+1. **Canonical NIE im Root-Layout setzen.** `alternates.canonical` in `app/layout.tsx` wird von **jeder** Unterseite geerbt, die es nicht selbst überschreibt → alle Unterseiten erklären die Startseite zum Original → Google deindexiert sie. Canonical gehört **in jede `page.tsx` einzeln** (`alternates: { canonical: "/pfad" }`), auch auf `/` selbst.
+2. **`openGraph`-Objekt wird ersetzt, nicht gemerged.** Setzt eine Unterseite eigene `openGraph`-Felder, verliert sie alle Layout-Defaults (Titel, Beschreibung, siteName). Root-Layout trägt nur sitegweite OG-Defaults (`type`, `siteName`, `locale`), Unterseiten setzen **kein** eigenes `openGraph` — Titel/Description fallen dann korrekt auf `title`/`description` der Seite zurück.
+
+**Jede neue `page.tsx` unter `app/` braucht:**
+```tsx
+export const metadata: Metadata = {
+  title: "Titel | ChorAI",              // ~50–60 Zeichen
+  description: "…",                      // 120–160 Zeichen
+  alternates: { canonical: "/pfad" },     // absolut über metadataBase, self-referencing
+};
+```
+Neue Route **immer** auch in `app/sitemap.ts` eintragen (sonst nicht auffindbar trotz korrektem Canonical). Rechtsseiten (`agb`, `datenschutz`, `impressum`) bekommen `robots: { index: false, follow: true }` statt eines robots.txt-Disallow — `app/robots.ts` blockt bewusst nichts (Disallow verhindert nur das Crawlen, nicht die Indexierung der URL selbst).
+
+`app/opengraph-image.tsx` generiert das Social-Preview-Bild (1200×630) zur Build-Zeit via Satori/`next/og` — bei Marken-/Farbänderungen dort anpassen, kein separates Bild-Asset pflegen.
+
+**FAQ-Sections** (`components/FAQSection.tsx`, eingebunden auf allen 5 `app/loesungen/*/page.tsx`): Accordion + eingebettetes FAQPage-JSON-LD. Seit Mai 2026 zeigt Google keine FAQ-Rich-Snippets mehr — der Wert liegt in Long-Tail-Abdeckung und KI-Zitierbarkeit (ChatGPT/Perplexity/AI Overviews), nicht in SERP-Snippets. Text muss serverseitig gerendert (kein Lazy-Load-only-Client) und wirklich sichtbar sein, sonst lesen es Crawler nicht.
+
+**SEO-Audit-Werkzeug:** User-level Skill `~/.claude/skills/seo-audit/` (nicht Teil dieses Repos) — `scripts/seo_audit.sh <url>` prüft Canonicals, Sitemap, robots.txt, OG-Tags, JSON-LD, AI-Crawler-Policy deterministisch; `scripts/psi_check.sh <url> mobile` misst Core Web Vitals über die PageSpeed-API. Vor jedem SEO-Fix als Vorher/Nachher-Vergleich nutzen. Letzter Lauf (2026-07-06, nach Deploy): **0 FAIL / 3 WARN** (die 3 WARN sind bewusste Inhaltsentscheidungen: Startseiten-Title/-Description etwas lang, Blog-Title kurz).
+
 ## Kontaktformular → E-Mail (PHP-Mailer)
 
 Das Portfolio-Kontaktformular sendet an einen **separaten PHP-Container**, nicht über das statische Portfolio-Image.
@@ -57,6 +80,10 @@ Das Portfolio-Kontaktformular sendet an einen **separaten PHP-Container**, nicht
 - **Deploy:** `docker compose --profile prod up -d --build portfolio-mailer caddy`
 
 > **`.env` enthält Secrets und ist gitignored** — niemals committen, niemals Inhalt ausgeben. Beispiel-Variablen stehen in `.env.example` / `env.template`.
+
+## Caddy: www→Apex-Redirect + HSTS (Muster für alle Domains)
+
+`docker/caddy/entrypoint.sh` leitet für `SITE_DOMAIN` (chorai.de) `www.` per 301 auf die Apex-Domain um, statt beide Hosts parallel auszuliefern (verhindert Duplicate-Content-Splitting) — zusätzlich `Strict-Transport-Security`-Header auf beiden Blocks. **Dasselbe Muster fehlt aktuell noch für `PORTFOLIO_DOMAIN`** (dort liefern `www.` und Apex weiterhin identisch aus) — bei nächster Gelegenheit angleichen. Änderungen an `entrypoint.sh` brauchen nur `docker compose --profile prod restart caddy` (kein Rebuild, das Skript wird als Volume gemountet).
 
 ## Deploy-Regel (verbindlich, vgl. AGENTS.md)
 
