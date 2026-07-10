@@ -10,3 +10,6 @@
 	path = pokedex
 	url = git@github.com:WaldemarChorow/pokedex.git
 	branch = main
+[submodule "join-app"]
+	path = join-app
+	url = https://github.com/WaldemarChorow/join.git

@@ -7,6 +7,7 @@ N8N_DOMAIN=${N8N_DOMAIN:-}
 PORTFOLIO_DOMAIN=${PORTFOLIO_DOMAIN:-}
 ELPOLOLOCO_DOMAIN=${ELPOLOLOCO_DOMAIN:-}
 POKEDEX_DOMAIN=${POKEDEX_DOMAIN:-}
+JOIN_DOMAIN=${JOIN_DOMAIN:-}
 SUPABASE_DOMAIN=${SUPABASE_DOMAIN:-}
 SUPABASE_KONG_HOST=${SUPABASE_KONG_HOST:-}
 SUPABASE_KONG_PORT=${SUPABASE_KONG_PORT:-8000}
@@ -92,6 +93,22 @@ cat <<EOF >>/etc/caddy/Caddyfile
 https://${POKEDEX_DOMAIN} {
     encode gzip
     reverse_proxy pokedex:3003
+}
+EOF
+fi
+
+if [ -n "$JOIN_DOMAIN" ]; then
+  JOIN_ROOT=${JOIN_DOMAIN#www.}
+cat <<EOF >>/etc/caddy/Caddyfile
+
+https://${JOIN_ROOT} {
+    encode gzip
+    reverse_proxy join:3004
+}
+
+https://www.${JOIN_ROOT} {
+    encode gzip
+    redir https://${JOIN_ROOT}{uri} permanent
 }
 EOF
 fi

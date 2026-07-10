@@ -145,6 +145,18 @@ services:
     networks:
       - internal
 
+  join:
+    profiles:
+      - prod
+    build:
+      context: ./join-app
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3004:3004"
+    restart: unless-stopped
+    networks:
+      - internal
+
   caddy:
     image: caddy:2-alpine
     profiles:
@@ -158,12 +170,15 @@ services:
         condition: service_started
       pokedex:
         condition: service_started
+      join:
+        condition: service_started
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN}
       N8N_DOMAIN: ${N8N_DOMAIN}
       PORTFOLIO_DOMAIN: ${PORTFOLIO_DOMAIN}
       ELPOLOLOCO_DOMAIN: ${ELPOLOLOCO_DOMAIN}
       POKEDEX_DOMAIN: ${POKEDEX_DOMAIN}
+      JOIN_DOMAIN: ${JOIN_DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL}
       SUPABASE_DOMAIN: ${SUPABASE_DOMAIN}
       SUPABASE_KONG_HOST: ${SUPABASE_KONG_HOST}
