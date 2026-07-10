@@ -13,6 +13,7 @@ Dieses Repo (`/var/www/Production`) ist ein **Multi-App-Monorepo** mit Docker-Co
 | `portfolio-mailer/` | Kontakt-Mailer fürs Portfolio | **PHP 8.3 + PHPMailer** | 8080 | im Hauptrepo |
 | `elpololoco/` | Subdomain-Projekt | statisch | 3002 | **Submodul** |
 | `pokedex/` | Subdomain-Projekt | statisch | 3003 | **Submodul** |
+| `join-app/` | join.waldemar-chorow.de | **Angular 21 + Supabase** | 3004 | **Submodul** |
 
 Weitere Compose-Services: `n8n` (Automatisierung/Mail), `caddy` (Reverse-Proxy + TLS), `mailpit` (nur `dev`-Profil, Mail-Catcher), Supabase (in `docker/supabase/`).
 
@@ -23,14 +24,14 @@ Weitere Compose-Services: `n8n` (Automatisierung/Mail), `caddy` (Reverse-Proxy +
 
 ## Submodule (wichtig!)
 
-`portfolio-app`, `elpololoco`, `pokedex` sind **Git-Submodule** (eigene Repos auf GitHub). Konsequenzen beim Arbeiten:
+`portfolio-app`, `elpololoco`, `pokedex`, `join-app` sind **Git-Submodule** (eigene Repos auf GitHub). Konsequenzen beim Arbeiten:
 
 - Änderungen an Submodul-Code: **zuerst im Submodul** committen+pushen, **dann** im Hauptrepo den neuen Submodul-Pointer committen.
   ```bash
   cd portfolio-app && git add … && git commit && git push origin master
   cd .. && git add portfolio-app && git commit   # aktualisiert den Pointer
   ```
-- `portfolio-app` trackt Branch **`master`** (nicht `main`). elpololoco/pokedex tracken `main`.
+- `portfolio-app` trackt Branch **`master`** (nicht `main`). elpololoco/pokedex/join-app tracken `main`.
 - Ein „dirty submodule" im Root-`git status` (` m portfolio-app`) heißt: im Submodul gibt es uncommittete/ungepushte Änderungen.
 
 ## Portfolio-App (Angular)
@@ -42,6 +43,14 @@ Weitere Compose-Services: `n8n` (Automatisierung/Mail), `caddy` (Reverse-Proxy +
 - i18n: `public/i18n/{de,en}.json`, ngx-translate. Neue UI-Texte **immer in beiden** Sprachen ergänzen.
 - Scroll-Verhalten zentral in `src/app/services/scroll.service.ts` (`scrollTo(section)` / `scrollToTop()`); navigiert von Unterseiten erst zur Startseite.
 - AOS (Animate-On-Scroll) ist eingebunden: `AOS.init()` in `app.ts` (`ngAfterViewInit`), CSS-Import in `src/styles.scss`, Animationen über `data-aos="…"`-Attribute direkt am Element.
+
+## Join-App (Angular 21 + Supabase)
+
+- **Kanban-Projektmanagement-Tool** mit Drag-and-Drop, Kontaktverwaltung und Dashboard. Statische SPA wie Portfolio, gebaut mit `ng build`, via `http-server` ausgeliefert auf Port 3004.
+- Branch-Tracking: `main` (nicht `master`).
+- Supabase-Integration: `@supabase/supabase-js` in Dependencies; Backend-Konfiguration erfolgt über Environment-Variablen (noch nicht implementiert, aber vorbereitet).
+- Verifikation lokal: `cd join-app && npm install && npm run build` oder Dev-Server: `npx ng serve --port 4200`.
+- Deploy: `docker compose --profile prod up -d --build join caddy`
 
 ## chorai-app: SEO & Metadaten (Next.js App Router)
 
@@ -93,6 +102,7 @@ docker compose --profile prod up -d --build <service>
 ```
 - chorai-app: `web` (danach `/api/health` prüfen)
 - portfolio: `portfolio`
+- join: `join` (+ `caddy` bei Routing-Änderung)
 - Mailer: `portfolio-mailer` (+ `caddy` bei Routing-Änderung)
 
 ## Verifikation / Testing
